@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>엔프타 서류 제출</title>
+<style>
+  :root {
+    --blue: #3182F6;
+    --blue-dark: #1B64DA;
+    --navy: #1A2744;
+    --gray: #8B95A1;
+    --border: #E5E8EB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    background: #FFFFFF;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 16px 80px;
+    color: #191F28;
+  }
+  .wrap { width: 100%; max-width: 520px; }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 40px;
+    font-weight: 800;
+    font-size: 19px;
+    color: var(--navy);
+  }
+  .brand .dot {
+    width: 28px; height: 28px;
+    border-radius: 9px;
+    background: var(--blue);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+  .brand .dot svg { width: 16px; height: 16px; }
+
+  .heading { text-align: center; margin-bottom: 32px; }
+  .heading .eyebrow {
+    font-size: 14px;
+    color: var(--blue-dark);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .heading h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #191F28;
+    line-height: 1.4;
+  }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 8px 30px rgba(20, 40, 90, 0.08);
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4E5968;
+    margin-bottom: 6px;
+  }
+  .field label .opt { color: var(--gray); font-weight: 500; }
+  input[type="text"], input[type="tel"], input[type="email"] {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #F9FAFB;
+    color: #191F28;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  input::placeholder { color: #B0B8C1; }
+  input:focus { border-color: var(--blue); background: white; }
+
+  .doc-slot {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .doc-slot:last-child { margin-bottom: 0; }
+  .doc-slot-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .doc-slot-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #191F28;
+  }
+  .doc-slot-title .idx {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #EAF2FF;
+    color: var(--blue-dark);
+    font-size: 10.5px;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .doc-slot-badge {
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 600;
+  }
+  .doc-slot-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .doc-upload-btn {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--blue);
+    background: #F5F9FF;
+    color: var(--blue-dark);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .doc-upload-btn:hover { background: #EAF2FF; }
+  .doc-file-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .doc-thumb {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: #F9FAFB;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .doc-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .doc-file-name {
+    font-size: 12.5px;
+    color: #191F28;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+  .doc-file-status {
+    font-size: 11px;
+    color: var(--gray);
+    flex-shrink: 0;
+  }
+  .doc-remove {
+    background: none;
+    border: none;
+    color: var(--gray);
+    font-size: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 2px;
+  }
+  .doc-placeholder {
+    font-size: 12.5px;
+    color: #B0B8C1;
+  }
+
+  .consent-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 2px;
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: pointer;
+    color: #4E5968;
+  }
+  .consent-row .check {
+    width: 18px; height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid #D1D6DB;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    color: white;
+    transition: all 0.12s ease;
+    margin-top: 1px;
+  }
+  .consent-row.checked .check { background: var(--blue); border-color: var(--blue); }
+  .consent-row .label-required { color: var(--blue); font-weight: 700; margin-right: 4px; }
+
+  .submit-btn {
+    width: 100%;
+    margin-top: 4px;
+    padding: 16px 0;
+    border: none;
+    border-radius: 14px;
+    background: var(--blue);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.05s ease;
+  }
+  .submit-btn:hover { background: var(--blue-dark); }
+  .submit-btn:active { transform: scale(0.99); }
+  .submit-btn:disabled { background: #B0B8C1; cursor: not-allowed; }
+
+  .foot-note {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--gray);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  .success {
+    display: none;
+    text-align: center;
+    padding: 40px 12px 8px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(20, 40, 90, 0.08);
+  }
+  .success .icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: #E8F3FF;
+    color: var(--blue);
+    font-size: 30px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+  }
+  .success h2 { font-size: 19px; margin-bottom: 8px; color: #191F28; }
+  .success p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+
+  @media (max-width: 380px) {
+    .card { padding: 20px 16px; }
+    .heading h1 { font-size: 19px; }
+    .doc-slot-body { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand"><span class="dot"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20H6C4.89543 20 4 19.1046 4 18V12Z" fill="white"/><circle cx="12" cy="12" r="2.4" fill="#3182F6"/></svg></span>토스플레이스 공식인증대리점 엔프타</div>
+
+  <div class="heading">
+    <div class="eyebrow">프로모션 진행을 위한 서류 제출</div>
+    <h1>기본정보와 서류를 올려주세요</h1>
+  </div>
+
+  <form id="docForm">
+
+    <div class="card">
+      <div class="card-title">기본정보</div>
+      <div class="field">
+        <label>상호</label>
+        <input type="text" id="shopName" placeholder="상호명을 입력해주세요" required>
+      </div>
+      <div class="field">
+        <label>대표자 성함</label>
+        <input type="text" id="repName" placeholder="대표자 성함을 입력해주세요" required>
+      </div>
+      <div class="field">
+        <label>일반전화 <span class="opt">(선택)</span></label>
+        <input type="tel" id="landline" placeholder="예) 062-000-0000" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>핸드폰번호</label>
+        <input type="tel" id="mobile" placeholder="예) 010-0000-0000" required inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>이메일</label>
+        <input type="email" id="email" placeholder="example@email.com" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">필요 서류</div>
+      <div id="docSlots"></div>
+    </div>
+
+    <div class="card">
+      <div class="consent-row checked" id="requiredConsent">
+        <div class="check">✓</div>
+        <div><span class="label-required">필수</span>제출한 서류는 상담·프로모션 진행 목적으로만 사용되며, 처리 완료 후 파기됩니다</div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">서류 제출하기</button>
+    <div class="foot-note">제출하신 서류는 담당자만 확인하며,<br>외부에 공유되지 않습니다.</div>
+  </form>
+
+  <div class="success" id="successView">
+    <div class="icon">✓</div>
+    <h2>서류가 제출되었습니다</h2>
+    <p>확인 후 담당자가 안내드릴게요.<br>감사합니다!</p>
+  </div>
+
+</div>
+
+<script>
+  // ⚠️ 구글 앱스스크립트 배포 후 받은 웹앱 URL로 바꿔주세요. (상담신청 페이지와 동일한 URL 사용 가능)
+  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxQgBxtt16oQivVMP9yASEiOeesXiBxCFFj35o2kAddueV8uHjjP5yOLfYLXFaugCDYPQ/exec";
+
+  const DOC_SLOTS = [
+    { id: "bizReg",    label: "사업자등록증 사진(컬러)", required: true },
+    { id: "bizLic",    label: "영업신고증", opt: "(해당 업종만)", required: false },
+    { id: "idCard",    label: "신분증 사진", required: true },
+    { id: "bankBook",  label: "통장 사진", required: true },
+    { id: "interior1", label: "매장 실내 사진 1", required: true },
+    { id: "interior2", label: "매장 실내 사진 2", required: true },
+    { id: "signage",   label: "매장간판사진(입구전경)", required: true },
+    { id: "roadSign",  label: "도로명주소표지판(건물외부)", required: true },
+  ];
+
+  const docState = {}; // id -> { file, base64, mimeType, name, status, previewUrl }
+  const docSlotsEl = document.getElementById("docSlots");
+
+  DOC_SLOTS.forEach((slot, idx) => {
+    const wrap = document.createElement("div");
+    wrap.className = "doc-slot";
+
+    const head = document.createElement("div");
+    head.className = "doc-slot-head";
+    const title = document.createElement("div");
+    title.className = "doc-slot-title";
+    title.innerHTML = '<span class="idx">' + (idx + 1) + '</span>' + slot.label;
+    head.appendChild(title);
+    if (!slot.required) {
+      const badge = document.createElement("div");
+      badge.className = "doc-slot-badge";
+      badge.textContent = slot.opt || "선택";
+      head.appendChild(badge);
+    }
+    wrap.appendChild(head);
+
+    const body = document.createElement("div");
+    body.className = "doc-slot-body";
+    body.id = "body_" + slot.id;
+    renderSlotBody(slot, body);
+    wrap.appendChild(body);
+
+    docSlotsEl.appendChild(wrap);
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*,application/pdf";
+    input.style.display = "none";
+    input.id = "input_" + slot.id;
+    input.addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) handleSlotFile(slot, file);
+      input.value = "";
+    });
+    wrap.appendChild(input);
+  });
+
+  function renderSlotBody(slot, body) {
+    body.innerHTML = "";
+    const state = docState[slot.id];
+
+    if (!state) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "doc-upload-btn";
+      btn.textContent = "사진 선택";
+      btn.onclick = () => document.getElementById("input_" + slot.id).click();
+      body.appendChild(btn);
+
+      const ph = document.createElement("div");
+      ph.className = "doc-placeholder";
+      ph.textContent = "선택된 파일 없음";
+      body.appendChild(ph);
+      return;
+    }
+
+    const info = document.createElement("div");
+    info.className = "doc-file-info";
+
+    const thumb = document.createElement("div");
+    thumb.className = "doc-thumb";
+    if (state.previewUrl) {
+      const img = document.createElement("img");
+      img.src = state.previewUrl;
+      thumb.appendChild(img);
+    } else {
+      thumb.textContent = "📄";
+    }
+    info.appendChild(thumb);
+
+    const name = document.createElement("div");
+    name.className = "doc-file-name";
+    name.textContent = state.name;
+    info.appendChild(name);
+
+    const status = document.createElement("div");
+    status.className = "doc-file-status";
+    status.textContent = state.status;
+    info.appendChild(status);
+
+    body.appendChild(info);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "doc-remove";
+    removeBtn.textContent = "✕";
+    removeBtn.onclick = () => {
+      delete docState[slot.id];
+      renderSlotBody(slot, body);
+    };
+    body.appendChild(removeBtn);
+  }
+
+  function compressImage(file, maxDim, quality) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = (e) => { img.src = e.target.result; };
+      reader.onerror = reject;
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round(height * (maxDim / width));
+            width = maxDim;
+          } else {
+            width = Math.round(width * (maxDim / height));
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function fileToBase64Raw(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleSlotFile(slot, file) {
+    const body = document.getElementById("body_" + slot.id);
+    docState[slot.id] = { file, name: file.name, mimeType: file.type, status: "처리 중", previewUrl: null, base64: null };
+    renderSlotBody(slot, body);
+
+    try {
+      let dataUrl, mimeType;
+      if (file.type && file.type.startsWith("image/")) {
+        dataUrl = await compressImage(file, 1920, 0.85);
+        mimeType = "image/jpeg";
+      } else {
+        dataUrl = await fileToBase64Raw(file);
+        mimeType = file.type || "application/octet-stream";
+      }
+      docState[slot.id].base64 = dataUrl.split(",")[1];
+      docState[slot.id].mimeType = mimeType;
+      docState[slot.id].previewUrl = mimeType.startsWith("image/") ? dataUrl : null;
+      docState[slot.id].status = "준비 완료";
+    } catch (err) {
+      docState[slot.id].status = "오류";
+    }
+    renderSlotBody(slot, body);
+  }
+
+  const requiredRow = document.getElementById("requiredConsent");
+  let requiredChecked = true;
+  requiredRow.addEventListener("click", () => {
+    requiredChecked = !requiredChecked;
+    requiredRow.classList.toggle("checked", requiredChecked);
+  });
+
+  document.getElementById("docForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    if (!requiredChecked) {
+      alert("필수 동의가 필요합니다.");
+      return;
+    }
+
+    const shopName = document.getElementById("shopName").value.trim();
+    const repName = document.getElementById("repName").value.trim();
+    const landline = document.getElementById("landline").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    const email = document.getElementById("email").value.trim();
+
+    if (!shopName || !repName || !mobile || !email) {
+      alert("필수 항목(상호, 대표자 성함, 핸드폰번호, 이메일)을 모두 입력해주세요.");
+      return;
+    }
+
+    const missing = DOC_SLOTS.filter(s => s.required && !docState[s.id]);
+    if (missing.length > 0) {
+      alert("다음 필수 서류를 첨부해주세요:\n" + missing.map(s => "- " + s.label).join("\n"));
+      return;
+    }
+    const notReady = DOC_SLOTS.filter(s => docState[s.id] && docState[s.id].status !== "준비 완료");
+    if (notReady.length > 0) {
+      alert("파일 처리가 아직 끝나지 않았어요. 잠시만 기다려주세요.");
+      return;
+    }
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.textContent = "제출 중...";
+
+    const files = DOC_SLOTS
+      .filter(s => docState[s.id])
+      .map(s => ({
+        label: s.label,
+        name: docState[s.id].name,
+        mimeType: docState[s.id].mimeType,
+        base64: docState[s.id].base64,
+      }));
+
+    const payload = {
+      formType: "docUpload",
+      shopName: shopName,
+      repName: repName,
+      landline: landline,
+      mobile: mobile,
+      email: email,
+      submittedAt: new Date().toLocaleString("ko-KR"),
+      files: files,
+    };
+
+    fetch(GAS_WEB_APP_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    })
+      .then(() => {
+        document.getElementById("docForm").style.display = "none";
+        document.getElementById("successView").style.display = "block";
+      })
+      .catch(() => {
+        alert("제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        btn.disabled = false;
+        btn.textContent = "서류 제출하기";
+      });
+  });
+</script>
+</body>
+</html>
