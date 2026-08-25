@@ -135,6 +135,12 @@
     color: var(--gray);
     font-weight: 600;
   }
+  .doc-slot-hint {
+    font-size: 11.5px;
+    color: var(--gray);
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
   .doc-slot-body {
     display: flex;
     align-items: center;
@@ -198,6 +204,40 @@
     font-size: 12.5px;
     color: #B0B8C1;
   }
+
+  .doc-placeholder-card {
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray);
+    padding: 20px 0;
+  }
+
+  .biz-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .biz-type-btn {
+    text-align: center;
+    padding: 14px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #F9FAFB;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #4E5968;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.12s ease;
+    line-height: 1.4;
+  }
+  .biz-type-btn:hover { border-color: #C7D3E0; }
+  .biz-type-btn.selected {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+  }
+  .biz-type-btn .sub { display: block; font-size: 11px; font-weight: 500; opacity: 0.8; margin-top: 2px; }
 
   .consent-row {
     display: flex;
@@ -288,6 +328,16 @@
   <form id="docForm">
 
     <div class="card">
+      <div class="card-title">사업자 유형</div>
+      <div class="biz-type-grid" id="bizTypeGrid">
+        <div class="biz-type-btn" data-value="new_individual">신규사업자<span class="sub">(개인)</span></div>
+        <div class="biz-type-btn" data-value="new_corp">신규사업자<span class="sub">(법인)</span></div>
+        <div class="biz-type-btn" data-value="existing_individual">기존사업자<span class="sub">(개인)</span></div>
+        <div class="biz-type-btn" data-value="existing_corp">기존사업자<span class="sub">(법인)</span></div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-title">기본정보</div>
       <div class="field">
         <label>상호</label>
@@ -306,8 +356,8 @@
         <input type="tel" id="mobile" placeholder="예) 010-0000-0000" required inputmode="numeric">
       </div>
       <div class="field">
-        <label>이메일</label>
-        <input type="email" id="email" placeholder="example@email.com" required>
+        <label>이메일 <span class="opt">(선택)</span></label>
+        <input type="email" id="email" placeholder="example@email.com">
       </div>
     </div>
 
@@ -319,7 +369,7 @@
     <div class="card">
       <div class="consent-row checked" id="requiredConsent">
         <div class="check">✓</div>
-        <div><span class="label-required">필수</span>제출한 서류는 상담·프로모션 진행 목적으로만 사용되며, 처리 완료 후 파기됩니다</div>
+        <div><span class="label-required">필수</span>제출한 서류는 카드사·밴(VAN)사 가맹점 심사 및 상담·프로모션 진행 목적으로 사용되며, 처리 완료 후 파기됩니다</div>
       </div>
     </div>
 
@@ -339,58 +389,116 @@
   // ⚠️ 구글 앱스스크립트 배포 후 받은 웹앱 URL로 바꿔주세요. (상담신청 페이지와 동일한 URL 사용 가능)
   const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxQgBxtt16oQivVMP9yASEiOeesXiBxCFFj35o2kAddueV8uHjjP5yOLfYLXFaugCDYPQ/exec";
 
-  const DOC_SLOTS = [
-    { id: "bizReg",    label: "사업자등록증 사진(컬러)", required: true },
-    { id: "bizLic",    label: "영업신고증", opt: "(해당 업종만)", required: false },
-    { id: "idCard",    label: "신분증 사진", required: true },
-    { id: "bankBook",  label: "통장 사진", required: true },
-    { id: "interior1", label: "매장 실내 사진 1", required: true },
-    { id: "interior2", label: "매장 실내 사진 2", required: true },
-    { id: "signage",   label: "매장간판사진(입구전경)", required: true },
-    { id: "roadSign",  label: "도로명주소표지판(건물외부)", required: true },
+  // 신규사업자(개인·법인 공통) 기본 서류
+  const NEW_COMMON = [
+    { id: "bizReg",       label: "사업자등록증 사본(원본 촬영) 1부", required: true, hint: "사본·스캔본이 아닌, 원본을 직접 촬영한 사진이어야 합니다." },
+    { id: "idCard",       label: "대표자 신분증 사본 (주민등록증 또는 운전면허증)", required: true, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
+    { id: "coRepIdCard",  label: "공동대표 신분증 사본", opt: "(공동대표인 경우만)", required: false, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
+    { id: "bankBook",     label: "정산 입금 통장 사본 (사업자 또는 대표자 명의)", required: true },
+    { id: "interior1",    label: "매장 내부 사진 1 (업종 관련)", required: true, hint: "업종을 확인할 수 있도록 관련 기구·집기가 함께 보이게 촬영해주세요. (예: 식당은 테이블, 카페는 주방·바 기기 등)" },
+    { id: "interior2",    label: "매장 내부 사진 2 (업종 관련)", required: true, hint: "1번 사진과 다른 각도 또는 다른 구역으로 촬영해주세요." },
+    { id: "signage",      label: "매장 외부 전경 및 간판 사진", required: true },
+    { id: "roadSign",     label: "도로명주소표지판 사진", required: true },
+    { id: "license",      label: "업종별 인·허가증 (영업신고증 등)", opt: "(해당 업종만)", required: false },
+  ];
+  // 신규사업자(법인) 추가 서류
+  const NEW_CORP_EXTRA = [
+    { id: "corpReg",          label: "법인 등기부등본", opt: "(최근 3개월 이내)", required: true },
+    { id: "corpSeal",         label: "법인 인감증명서", opt: "(최근 3개월 이내)", required: true },
+    { id: "shareholderList",  label: "주주명부", opt: "(최근 3개월 이내, 인감 날인)", required: true },
+    { id: "sealUsage",        label: "사용인감계", opt: "(사용인감 사용 시만)", required: false },
+  ];
+  // 기존사업자(개인·법인 공통) 서류 — 토스페이 청약용
+  const EXISTING_COMMON = [
+    { id: "bizReg",   label: "사업자등록증 사본(원본 촬영)", required: true, hint: "사본·스캔본이 아닌, 원본을 직접 촬영한 사진이어야 합니다." },
+    { id: "idCard",   label: "대표자 신분증 사본", opt: "(미첨부 시 휴대폰 인증으로 대체 가능)", required: false, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
+    { id: "bankBook", label: "정산 통장 사진", required: true },
   ];
 
+  const TYPE_SLOTS = {
+    new_individual: NEW_COMMON,
+    new_corp: NEW_COMMON.concat(NEW_CORP_EXTRA),
+    existing_individual: EXISTING_COMMON,
+    existing_corp: EXISTING_COMMON,
+  };
+  const BIZ_TYPE_LABELS = {
+    new_individual: "신규사업자(개인)",
+    new_corp: "신규사업자(법인)",
+    existing_individual: "기존사업자(개인)",
+    existing_corp: "기존사업자(법인)",
+  };
+
+  let DOC_SLOTS = [];
+  let selectedBizType = "";
   const docState = {}; // id -> { file, base64, mimeType, name, status, previewUrl }
   const docSlotsEl = document.getElementById("docSlots");
 
-  DOC_SLOTS.forEach((slot, idx) => {
-    const wrap = document.createElement("div");
-    wrap.className = "doc-slot";
+  function showBizTypePlaceholder() {
+    docSlotsEl.innerHTML = '<div class="doc-placeholder-card">먼저 위에서 사업자 유형을 선택해주세요</div>';
+  }
+  showBizTypePlaceholder();
 
-    const head = document.createElement("div");
-    head.className = "doc-slot-head";
-    const title = document.createElement("div");
-    title.className = "doc-slot-title";
-    title.innerHTML = '<span class="idx">' + (idx + 1) + '</span>' + slot.label;
-    head.appendChild(title);
-    if (!slot.required) {
-      const badge = document.createElement("div");
-      badge.className = "doc-slot-badge";
-      badge.textContent = slot.opt || "선택";
-      head.appendChild(badge);
-    }
-    wrap.appendChild(head);
-
-    const body = document.createElement("div");
-    body.className = "doc-slot-body";
-    body.id = "body_" + slot.id;
-    renderSlotBody(slot, body);
-    wrap.appendChild(body);
-
-    docSlotsEl.appendChild(wrap);
-
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*,application/pdf";
-    input.style.display = "none";
-    input.id = "input_" + slot.id;
-    input.addEventListener("change", (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (file) handleSlotFile(slot, file);
-      input.value = "";
+  document.querySelectorAll(".biz-type-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".biz-type-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedBizType = btn.dataset.value;
+      buildDocSlots(selectedBizType);
     });
-    wrap.appendChild(input);
   });
+
+  function buildDocSlots(type) {
+    // 유형이 바뀌면 이전에 첨부한 파일 상태는 초기화됩니다
+    Object.keys(docState).forEach(k => delete docState[k]);
+    DOC_SLOTS = TYPE_SLOTS[type] || [];
+    docSlotsEl.innerHTML = "";
+
+    DOC_SLOTS.forEach((slot, idx) => {
+      const wrap = document.createElement("div");
+      wrap.className = "doc-slot";
+
+      const head = document.createElement("div");
+      head.className = "doc-slot-head";
+      const title = document.createElement("div");
+      title.className = "doc-slot-title";
+      title.innerHTML = '<span class="idx">' + (idx + 1) + '</span>' + slot.label;
+      head.appendChild(title);
+      if (!slot.required) {
+        const badge = document.createElement("div");
+        badge.className = "doc-slot-badge";
+        badge.textContent = slot.opt || "선택";
+        head.appendChild(badge);
+      }
+      wrap.appendChild(head);
+
+      if (slot.hint) {
+        const hint = document.createElement("div");
+        hint.className = "doc-slot-hint";
+        hint.textContent = slot.hint;
+        wrap.appendChild(hint);
+      }
+
+      const body = document.createElement("div");
+      body.className = "doc-slot-body";
+      body.id = "body_" + slot.id;
+      renderSlotBody(slot, body);
+      wrap.appendChild(body);
+
+      docSlotsEl.appendChild(wrap);
+
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*,application/pdf";
+      input.style.display = "none";
+      input.id = "input_" + slot.id;
+      input.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) handleSlotFile(slot, file);
+        input.value = "";
+      });
+      wrap.appendChild(input);
+    });
+  }
 
   function renderSlotBody(slot, body) {
     body.innerHTML = "";
@@ -525,22 +633,23 @@
       return;
     }
 
+    if (!selectedBizType) {
+      alert("사업자 유형을 먼저 선택해주세요.");
+      return;
+    }
+
     const shopName = document.getElementById("shopName").value.trim();
     const repName = document.getElementById("repName").value.trim();
     const landline = document.getElementById("landline").value.trim();
     const mobile = document.getElementById("mobile").value.trim();
     const email = document.getElementById("email").value.trim();
 
-    if (!shopName || !repName || !mobile || !email) {
-      alert("필수 항목(상호, 대표자 성함, 핸드폰번호, 이메일)을 모두 입력해주세요.");
+    if (!shopName || !repName || !mobile) {
+      alert("필수 항목(상호, 대표자 성함, 핸드폰번호)을 모두 입력해주세요.");
       return;
     }
 
-    const missing = DOC_SLOTS.filter(s => s.required && !docState[s.id]);
-    if (missing.length > 0) {
-      alert("다음 필수 서류를 첨부해주세요:\n" + missing.map(s => "- " + s.label).join("\n"));
-      return;
-    }
+    // 서류 첨부는 필수가 아닙니다 — 빠뜨려도 제출 가능
     const notReady = DOC_SLOTS.filter(s => docState[s.id] && docState[s.id].status !== "준비 완료");
     if (notReady.length > 0) {
       alert("파일 처리가 아직 끝나지 않았어요. 잠시만 기다려주세요.");
@@ -562,6 +671,7 @@
 
     const payload = {
       formType: "docUpload",
+      bizCategory: BIZ_TYPE_LABELS[selectedBizType] || selectedBizType,
       shopName: shopName,
       repName: repName,
       landline: landline,
