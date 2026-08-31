@@ -391,30 +391,30 @@
 
   // 신규사업자(개인·법인 공통) 기본 서류
   const NEW_COMMON = [
-    { id: "bizReg",       label: "사업자등록증 사본(원본 촬영) 1부", required: true, hint: "사본·스캔본이 아닌, 원본을 직접 촬영한 사진이어야 합니다." },
-    { id: "idCard",       label: "대표자 신분증 사본 (주민등록증 또는 운전면허증)", required: true, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
-    { id: "coRepIdCard",  label: "공동대표 신분증 사본", opt: "(공동대표인 경우만)", required: false, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
-    { id: "bankBook",     label: "정산 입금 통장 사본 (사업자 또는 대표자 명의)", required: true },
-    { id: "interior1",    label: "매장 내부 사진 1 (업종 관련)", required: true, hint: "업종을 확인할 수 있도록 관련 기구·집기가 함께 보이게 촬영해주세요. (예: 식당은 테이블, 카페는 주방·바 기기 등)" },
-    { id: "interior2",    label: "매장 내부 사진 2 (업종 관련)", required: true, hint: "1번 사진과 다른 각도 또는 다른 구역으로 촬영해주세요." },
-    { id: "signage",      label: "매장 외부 전경 및 간판 사진", required: true },
-    { id: "roadSign",     label: "도로명주소표지판 사진", required: true },
-    { id: "license",      label: "업종별 인·허가증 (영업신고증 등)", opt: "(해당 업종만)", required: false },
+    { id: "bizReg",       label: "사업자등록증 사본(원본 촬영) 1부", shortName: "사업자등록증", required: true, hint: "사본·스캔본이 아닌, 원본을 직접 촬영한 사진이어야 합니다." },
+    { id: "idCard",       label: "대표자 신분증 사본 (주민등록증 또는 운전면허증)", shortName: "신분증", required: true, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
+    { id: "coRepIdCard",  label: "공동대표 신분증 사본", shortName: "공동대표신분증", opt: "(공동대표인 경우만)", required: false, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
+    { id: "bankBook",     label: "정산 입금 통장 사본 (사업자 또는 대표자 명의)", shortName: "통장사본", required: true },
+    { id: "interior1",    label: "매장 내부 사진 1 (업종 관련)", shortName: "매장내부사진1", required: true, hint: "업종을 확인할 수 있도록 관련 기구·집기가 함께 보이게 촬영해주세요. (예: 식당은 테이블, 카페는 주방·바 기기 등)" },
+    { id: "interior2",    label: "매장 내부 사진 2 (업종 관련)", shortName: "매장내부사진2", required: true, hint: "1번 사진과 다른 각도 또는 다른 구역으로 촬영해주세요." },
+    { id: "signage",      label: "매장 외부 전경 및 간판 사진", shortName: "매장간판사진", required: true },
+    { id: "roadSign",     label: "도로명주소표지판 사진", shortName: "도로명표지판", required: true },
+    { id: "license",      label: "업종별 인·허가증 (영업신고증 등)", shortName: "업종인허가증", opt: "(해당 업종만)", required: false },
   ];
   // 신규사업자(법인) 추가 서류
   const NEW_CORP_EXTRA = [
-    { id: "corpReg",          label: "법인 등기부등본", opt: "(최근 3개월 이내)", required: true },
-    { id: "corpSeal",         label: "법인 인감증명서", opt: "(최근 3개월 이내)", required: true },
-    { id: "shareholderList",  label: "주주명부", opt: "(최근 3개월 이내, 인감 날인)", required: true },
-    { id: "sealUsage",        label: "사용인감계", opt: "(사용인감 사용 시만)", required: false },
-    { id: "ownerConfirm",     label: "법인소유지배자확인서", required: true },
-    { id: "corpCustomerConfirm", label: "법인용고객거래확인서", required: true },
+    { id: "corpReg",          label: "법인 등기부등본", shortName: "법인등기부등본", opt: "(최근 3개월 이내)", required: true },
+    { id: "corpSeal",         label: "법인 인감증명서", shortName: "법인인감증명서", opt: "(최근 3개월 이내)", required: true },
+    { id: "shareholderList",  label: "주주명부", shortName: "주주명부", opt: "(최근 3개월 이내, 인감 날인)", required: true },
+    { id: "sealUsage",        label: "사용인감계", shortName: "사용인감계", opt: "(사용인감 사용 시만)", required: false },
+    { id: "ownerConfirm",     label: "법인소유지배자확인서", shortName: "법인소유지배자확인서", required: true },
+    { id: "corpCustomerConfirm", label: "법인용고객거래확인서", shortName: "법인용고객거래확인서", required: true },
   ];
   // 기존사업자(개인·법인 공통) 서류 — 토스페이 청약용
   const EXISTING_COMMON = [
-    { id: "bizReg",   label: "사업자등록증 사본(원본 촬영)", required: true, hint: "사본·스캔본이 아닌, 원본을 직접 촬영한 사진이어야 합니다." },
-    { id: "idCard",   label: "대표자 신분증 사본", opt: "(미첨부 시 휴대폰 인증으로 대체 가능)", required: false, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
-    { id: "bankBook", label: "정산 통장 사진", required: true },
+    { id: "bizReg",   label: "사업자등록증 사본(원본 촬영)", shortName: "사업자등록증", required: true, hint: "사본·스캔본이 아닌, 원본을 직접 촬영한 사진이어야 합니다." },
+    { id: "idCard",   label: "대표자 신분증 사본", shortName: "신분증", opt: "(미첨부 시 휴대폰 인증으로 대체 가능)", required: false, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
+    { id: "bankBook", label: "정산 통장 사진", shortName: "통장사본", required: true },
   ];
 
   const TYPE_SLOTS = {
@@ -666,6 +666,7 @@
       .filter(s => docState[s.id])
       .map(s => ({
         label: s.label,
+        shortName: s.shortName,
         name: docState[s.id].name,
         mimeType: docState[s.id].mimeType,
         base64: docState[s.id].base64,
