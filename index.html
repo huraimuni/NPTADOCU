@@ -416,12 +416,20 @@
     { id: "idCard",   label: "대표자 신분증 사본", shortName: "신분증", opt: "(미첨부 시 휴대폰 인증으로 대체 가능)", required: false, hint: "주민등록번호 뒷자리를 가리지 말고 전체가 보이도록 촬영해주세요." },
     { id: "bankBook", label: "정산 통장 사진", shortName: "통장사본", required: true },
   ];
+  // 기존사업자(법인) 추가 서류
+  const EXISTING_CORP_EXTRA = [
+    { id: "existCorpSeal",     label: "법인인감증명서", shortName: "법인인감증명서", opt: "(최근 3개월 이내 발급)", required: true },
+    { id: "existCorpReg",      label: "법인등기부등본", shortName: "법인등기부등본", opt: "(최근 3개월 이내 발급)", required: true },
+    { id: "beneficialOwner",   label: "실소유자확인서류", shortName: "실소유자확인서류", opt: "(주주명부 또는 사원명부 또는 실제소유자확인서)", required: true },
+    { id: "articlesOfAssoc",   label: "정관 또는 회칙", shortName: "정관또는회칙", required: true },
+    { id: "existSealUsage",    label: "사용인감계", shortName: "사용인감계", opt: "(사용인감을 사용하는 경우 준비)", required: false },
+  ];
 
   const TYPE_SLOTS = {
     new_individual: NEW_COMMON,
     new_corp: NEW_COMMON.concat(NEW_CORP_EXTRA),
     existing_individual: EXISTING_COMMON,
-    existing_corp: EXISTING_COMMON,
+    existing_corp: EXISTING_COMMON.concat(EXISTING_CORP_EXTRA),
   };
   const BIZ_TYPE_LABELS = {
     new_individual: "신규사업자(개인)",
