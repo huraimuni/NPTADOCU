@@ -313,9 +313,94 @@
     .heading h1 { font-size: 19px; }
     .doc-slot-body { flex-wrap: wrap; }
   }
+  /* Consent modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 20, 30, 0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 16px;
+    max-width: 440px;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-head {
+    padding: 20px 22px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-head h3 { font-size: 16px; font-weight: 800; color: #191F28; }
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    font-size: 20px; color: var(--gray); line-height: 1;
+    padding: 4px;
+  }
+  .modal-body {
+    padding: 18px 22px 22px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #333;
+  }
+  .modal-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px;
+    font-size: 12.5px;
+  }
+  .modal-body th, .modal-body td {
+    border: 1px solid var(--border);
+    padding: 7px 9px;
+    text-align: left;
+  }
+  .modal-body th { background: #F9FAFB; font-weight: 700; width: 30%; }
+  .modal-body p { margin-bottom: 10px; }
+  .modal-body .note { color: var(--gray); font-size: 12px; }
+  .consent-sub {
+    padding-left: 26px;
+    font-size: 12.5px;
+    color: var(--gray);
+    display: flex;
+    justify-content: space-between;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .consent-sub a { color: var(--gray); text-decoration: underline; }
 </style>
 </head>
 <body>
+
+<div class="modal-overlay" id="modalPrivacy">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>개인정보 수집·이용 동의</h3>
+      <button class="modal-close" onclick="closeModal('modalPrivacy')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>토스플레이스 공식대리점 나인페이먼츠는 가맹점 서류 접수를 위해 아래와 같이 개인정보를 수집·이용합니다.</p>
+      <table>
+        <tr><th>수집 항목</th><td>상호, 대표자 성함, 일반전화, 핸드폰번호, 이메일(선택), 사업자등록증·신분증·통장 사본 등 제출 서류 일체</td></tr>
+        <tr><th>수집 목적</th><td>카드사·밴(VAN)사 가맹점 심사 접수 및 상담·프로모션 진행을 위한 연락</td></tr>
+        <tr><th>보유·이용 기간</th><td>심사·처리 완료 후 파기 (관계 법령에 따라 보존이 필요한 경우 해당 기간 동안 보관)</td></tr>
+      </table>
+      <p class="note">귀하는 개인정보 수집·이용에 대한 동의를 거부할 권리가 있습니다. 다만 동의하지 않으실 경우 서류 접수가 제한될 수 있습니다.</p>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
 
   <div class="brand"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL8AAAAgCAMAAAB0BFmiAAAAflBMVEWWn6wccecyRmIti+RSmOSryedNXnRkc4iJuOgAFzzEyc98h5j+/v4QiesNJ0sEZ+7S5PEYkfB0t+kvleXl6u+RxuwDHUKz1u9SpubM3e1vqeglOVcZMVPP09gTc+q0u8MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3aU+8AAAAIHRSTlP//////////////////////////////////////////3Fe9GAAAASySURBVHja7Zhbm6MgDIY91zqCyEHEWv3//3KTAB6m7ezczD7bfTYXLanYvoTkIzZp39uS//x/I79Ikvsb8+vser3d34S/SZLERX8FR7cJ5/PwzdQyxehNGvtznMI594K/uvIh08G/Xfk1QX58+5bJhW02ip/iL7olFS/4B86HS+QH8rVtL5xX+pv87GDqp7Yg7brOvebnPNn4hxUrQH/3m5FfFUUxFrSAH+LPgV98xY9R3/nvzb2BRTRNqds7lMS63YDeSZsk65mkUalgAbQB1hhT0s85IeLP0si/GGNFmGd3Krwr7J+wmO7C1LX12Y/xL4WjqLqyrmv/9Qf+TOz8LuMc9CcZoIoTTCleNTTdXcibq/UJP20FDO3oc2kSrct7Nu7zrGGKSYnrVCbMg4HXAcV2d+qWzsgOrRA++mBLN8Faii4lZxInfl498H/AlZu/yElO71nw+Jw84TfEvxcE/PSI1HRRYXIZ1veqR2M9LQMG/vq43TURP9J6y332o6VFq/ODs/HPPNTwp/h7dOTFqzqDibfLJdvzbQv6PswZy0cJPLguy8IGWHKRv2dKETig44Cu06LpLsZqz78toT7Gvwb8pZiKtFvcxn9NaBOSZ/zVKkoEBomFfOIV7Rr6D/wCA2paMZKMIrDCsPdKhG0SxM+kEH4dMMCP4bqN2mVxm4TnL5wuMdgQdEH5r+GLALzDiXoq2wO/oCA3j/wz5k3JaQCfzl7EQF95s/OPUHnGp/VejgURI6DBtVGcgZvlPl3CvhSUYJJWHnPQUP6npAk+gSiD6KuRvxafzq9wZPEMwYFfbPXrq0LjBtzvmEsXsmpX3JP+ewhby2kaFZEdwEv/JmPVmLgQS9k/SrSRKmDytQqCgYmuD/o/pZT6Re3aY/x9TvDqduT/AP7Lzr/ijGEI5T4840ckm0ePShcAewthpqPhkX+iWeoUhHHnF8snfpFS/aaYVif+TYdO+vnAP5NhxR/5czClJO6rI19RjSI/Fa4N3F/y52QsP8b/gR/0M33QH+LX2W/4KX+ScgUrm3UVh/yH9kocfJLmKJ0K9SiMX/Fj1hgHh5Z1wlnxFT/QuHoiRXIn/vZ+i/xP86fB+g1RF82pf5CH8xhQchEEn5il18qxfclfhpPDn+Lx/HrB72JDB4J05vclEOM/f45/4/X04651kvHkC34io7xCfuHPK/MVP0nv6PDsXuQzfoz3BH0E5H+OK9T5gX+OvfJH6ITEE34Q11Ait/nF+UVW+5PIV2Q4Wvs+COsrftoARgcbW2rPL4/8ky/aggYgP+Qe9dMbAl6B/zYgL/QPwzH+rb7E/oFf9KH/P/JHLVF7N4f8Y/uKnyG/X3bsOlAlUx//oJ/OH8WLKLpoi/X8lznbuhlR3bJb2Wp4yyD+4Hh+9CnlkwqDP2f7w43JVV6fHpWmnE7TEkQotj4UY2pRlap9t6YUfSRVmGVH0l0lMTD1kqc0T+RpWuAnJSbMApJT+xUshQv6qfWx2feOPr2d5kADvf7m0VhYe3qOGb/3XCBsad0Jg0bxsitDzwzz4vCP/H9i9g71/f7/kdTu5+JN+TU1+T8W/j/DHx/B3jF/TKFG8///z3+V/xfHtzvW1q62cQAAAABJRU5ErkJggg==" alt="나인페이먼츠" style="height:28px;width:auto;flex-shrink:0;"></div>
@@ -371,6 +456,9 @@
         <div class="check">✓</div>
         <div><span class="label-required">필수</span>제출한 서류는 카드사·밴(VAN)사 가맹점 심사 및 상담·프로모션 진행 목적으로 사용되며, 처리 완료 후 파기됩니다</div>
       </div>
+      <div class="consent-sub">
+        <span>개인정보 수집·이용 동의</span><a href="#" onclick="openModal('modalPrivacy'); return false;">보기</a>
+      </div>
     </div>
 
     <button type="submit" class="submit-btn" id="submitBtn">서류 제출하기</button>
@@ -388,6 +476,18 @@
 <script>
   // ⚠️ 구글 앱스스크립트 배포 후 받은 웹앱 URL로 바꿔주세요. (상담신청 페이지와 동일한 URL 사용 가능)
   const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxQgBxtt16oQivVMP9yASEiOeesXiBxCFFj35o2kAddueV8uHjjP5yOLfYLXFaugCDYPQ/exec";
+
+  function openModal(id) {
+    document.getElementById(id).classList.add("open");
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove("open");
+  }
+  document.querySelectorAll(".modal-overlay").forEach(overlay => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.classList.remove("open");
+    });
+  });
 
   // 신규사업자(개인·법인 공통) 기본 서류
   const NEW_COMMON = [
