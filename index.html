@@ -348,12 +348,12 @@
         <input type="text" id="repName" placeholder="대표자 성함을 입력해주세요" required>
       </div>
       <div class="field">
-        <label>일반전화 <span class="opt">(선택)</span></label>
-        <input type="tel" id="landline" placeholder="예) 062-000-0000" inputmode="numeric">
+        <label>일반전화 <span class="opt">(없을시 핸드폰번호로 기입)</span></label>
+        <input type="tel" id="landline" placeholder="예) 062-000-0000" required inputmode="numeric">
       </div>
       <div class="field">
-        <label>핸드폰번호 <span class="opt">(일반전화 없으면 필수)</span></label>
-        <input type="tel" id="mobile" placeholder="예) 010-0000-0000" inputmode="numeric">
+        <label>핸드폰번호</label>
+        <input type="tel" id="mobile" placeholder="예) 010-0000-0000" required inputmode="numeric">
       </div>
       <div class="field">
         <label>이메일 <span class="opt">(세금계산서 발행용, 선택)</span></label>
@@ -659,12 +659,8 @@
     const mobile = document.getElementById("mobile").value.trim();
     const email = document.getElementById("email").value.trim();
 
-    if (!shopName || !repName) {
-      alert("필수 항목(상호, 대표자 성함)을 모두 입력해주세요.");
-      return;
-    }
-    if (!landline && !mobile) {
-      alert("전화번호는 필수입니다. 일반전화가 없으면 핸드폰번호를 입력해주세요.");
+    if (!shopName || !repName || !landline || !mobile) {
+      alert("필수 항목(상호, 대표자 성함, 일반전화, 핸드폰번호)을 모두 입력해주세요. 일반전화가 없으면 핸드폰번호를 똑같이 입력해주세요.");
       return;
     }
 
