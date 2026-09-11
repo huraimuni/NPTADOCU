@@ -473,10 +473,15 @@
       title.className = "doc-slot-title";
       title.innerHTML = '<span class="idx">' + (idx + 1) + '</span>' + slot.label;
       head.appendChild(title);
-      if (!slot.required) {
+      if (slot.opt) {
         const badge = document.createElement("div");
         badge.className = "doc-slot-badge";
-        badge.textContent = slot.opt || "선택";
+        badge.textContent = slot.opt;
+        head.appendChild(badge);
+      } else if (!slot.required) {
+        const badge = document.createElement("div");
+        badge.className = "doc-slot-badge";
+        badge.textContent = "선택";
         head.appendChild(badge);
       }
       wrap.appendChild(head);
