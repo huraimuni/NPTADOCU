@@ -352,11 +352,11 @@
         <input type="tel" id="landline" placeholder="예) 062-000-0000" inputmode="numeric">
       </div>
       <div class="field">
-        <label>핸드폰번호</label>
-        <input type="tel" id="mobile" placeholder="예) 010-0000-0000" required inputmode="numeric">
+        <label>핸드폰번호 <span class="opt">(일반전화 없으면 필수)</span></label>
+        <input type="tel" id="mobile" placeholder="예) 010-0000-0000" inputmode="numeric">
       </div>
       <div class="field">
-        <label>이메일 <span class="opt">(선택)</span></label>
+        <label>이메일 <span class="opt">(세금계산서 발행용, 선택)</span></label>
         <input type="email" id="email" placeholder="example@email.com">
       </div>
     </div>
@@ -659,8 +659,12 @@
     const mobile = document.getElementById("mobile").value.trim();
     const email = document.getElementById("email").value.trim();
 
-    if (!shopName || !repName || !mobile) {
-      alert("필수 항목(상호, 대표자 성함, 핸드폰번호)을 모두 입력해주세요.");
+    if (!shopName || !repName) {
+      alert("필수 항목(상호, 대표자 성함)을 모두 입력해주세요.");
+      return;
+    }
+    if (!landline && !mobile) {
+      alert("전화번호는 필수입니다. 일반전화가 없으면 핸드폰번호를 입력해주세요.");
       return;
     }
 
