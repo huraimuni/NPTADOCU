@@ -200,6 +200,18 @@
     flex-shrink: 0;
     padding: 2px;
   }
+  .doc-multi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .doc-multi-list:empty { margin-bottom: 0; }
+  .doc-multi-add-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
   .doc-placeholder {
     font-size: 12.5px;
     color: #B0B8C1;
@@ -503,9 +515,9 @@
   ];
   // 신규사업자(법인) 추가 서류
   const NEW_CORP_EXTRA = [
-    { id: "corpReg",          label: "법인 등기부등본", shortName: "법인등기부등본", opt: "(최근 3개월 이내)", required: true },
+    { id: "corpReg",          label: "법인 등기부등본", shortName: "법인등기부등본", opt: "(최근 3개월 이내)", required: true, multi: true },
     { id: "corpSeal",         label: "법인 인감증명서", shortName: "법인인감증명서", opt: "(최근 3개월 이내)", required: true },
-    { id: "shareholderList",  label: "주주명부", shortName: "주주명부", opt: "(최근 3개월 이내, 인감 날인)", required: true },
+    { id: "shareholderList",  label: "주주명부", shortName: "주주명부", opt: "(최근 3개월 이내, 인감 날인)", required: true, multi: true },
     { id: "sealUsage",        label: "사용인감계", shortName: "사용인감계", opt: "(사용인감 사용 시만)", required: false },
     { id: "ownerConfirm",     label: "법인소유지배자확인서", shortName: "법인소유지배자확인서", required: true },
     { id: "corpCustomerConfirm", label: "법인용고객거래확인서", shortName: "법인용고객거래확인서", required: true },
@@ -519,9 +531,9 @@
   // 기존사업자(법인) 추가 서류
   const EXISTING_CORP_EXTRA = [
     { id: "existCorpSeal",     label: "법인인감증명서", shortName: "법인인감증명서", opt: "(최근 3개월 이내 발급)", required: true },
-    { id: "existCorpReg",      label: "법인등기부등본", shortName: "법인등기부등본", opt: "(최근 3개월 이내 발급)", required: true },
-    { id: "beneficialOwner",   label: "실소유자확인서류", shortName: "실소유자확인서류", opt: "(주주명부 또는 사원명부 또는 실제소유자확인서)", required: true },
-    { id: "articlesOfAssoc",   label: "정관 또는 회칙", shortName: "정관또는회칙", required: true },
+    { id: "existCorpReg",      label: "법인등기부등본", shortName: "법인등기부등본", opt: "(최근 3개월 이내 발급)", required: true, multi: true },
+    { id: "beneficialOwner",   label: "실소유자확인서류", shortName: "실소유자확인서류", opt: "(주주명부 또는 사원명부 또는 실제소유자확인서)", required: true, multi: true },
+    { id: "articlesOfAssoc",   label: "정관 또는 회칙", shortName: "정관또는회칙", required: true, multi: true },
     { id: "existSealUsage",    label: "사용인감계", shortName: "사용인감계", opt: "(사용인감을 사용하는 경우 준비)", required: false },
   ];
 
@@ -606,9 +618,10 @@
       input.accept = "image/png,image/jpeg,image/jpg,application/pdf";
       input.style.display = "none";
       input.id = "input_" + slot.id;
+      if (slot.multi) input.multiple = true;
       input.addEventListener("change", (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (file) handleSlotFile(slot, file);
+        const chosen = Array.from(e.target.files || []);
+        chosen.forEach(file => handleSlotFile(slot, file));
         input.value = "";
       });
       wrap.appendChild(input);
@@ -617,6 +630,69 @@
 
   function renderSlotBody(slot, body) {
     body.innerHTML = "";
+
+    if (slot.multi) {
+      const list = docState[slot.id] || [];
+      const listEl = document.createElement("div");
+      listEl.className = "doc-multi-list";
+
+      list.forEach((state, i) => {
+        const info = document.createElement("div");
+        info.className = "doc-file-info";
+
+        const thumb = document.createElement("div");
+        thumb.className = "doc-thumb";
+        if (state.previewUrl) {
+          const img = document.createElement("img");
+          img.src = state.previewUrl;
+          thumb.appendChild(img);
+        } else {
+          thumb.textContent = "📄";
+        }
+        info.appendChild(thumb);
+
+        const name = document.createElement("div");
+        name.className = "doc-file-name";
+        name.textContent = (i + 1) + "장 · " + state.name;
+        info.appendChild(name);
+
+        const status = document.createElement("div");
+        status.className = "doc-file-status";
+        status.textContent = state.status;
+        info.appendChild(status);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "doc-remove";
+        removeBtn.textContent = "✕";
+        removeBtn.onclick = () => {
+          docState[slot.id].splice(i, 1);
+          renderSlotBody(slot, body);
+        };
+        info.appendChild(removeBtn);
+
+        listEl.appendChild(info);
+      });
+      body.appendChild(listEl);
+
+      const addRow = document.createElement("div");
+      addRow.className = "doc-multi-add-row";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "doc-upload-btn";
+      btn.textContent = list.length > 0 ? "사진 추가" : "사진 선택";
+      btn.onclick = () => document.getElementById("input_" + slot.id).click();
+      addRow.appendChild(btn);
+      if (list.length === 0) {
+        const ph = document.createElement("div");
+        ph.className = "doc-placeholder";
+        ph.textContent = "선택된 파일 없음 (여러 장 첨부 가능)";
+        addRow.appendChild(ph);
+      }
+      body.appendChild(addRow);
+      return;
+    }
+
     const state = docState[slot.id];
 
     if (!state) {
@@ -711,6 +787,33 @@
 
   async function handleSlotFile(slot, file) {
     const body = document.getElementById("body_" + slot.id);
+
+    if (slot.multi) {
+      if (!docState[slot.id]) docState[slot.id] = [];
+      const entry = { file, name: file.name, mimeType: file.type, status: "처리 중", previewUrl: null, base64: null };
+      docState[slot.id].push(entry);
+      renderSlotBody(slot, body);
+
+      try {
+        let dataUrl, mimeType;
+        if (file.type && file.type.startsWith("image/")) {
+          dataUrl = await compressImage(file, 1920, 0.85);
+          mimeType = "image/jpeg";
+        } else {
+          dataUrl = await fileToBase64Raw(file);
+          mimeType = file.type || "application/octet-stream";
+        }
+        entry.base64 = dataUrl.split(",")[1];
+        entry.mimeType = mimeType;
+        entry.previewUrl = mimeType.startsWith("image/") ? dataUrl : null;
+        entry.status = "준비 완료";
+      } catch (err) {
+        entry.status = "오류";
+      }
+      renderSlotBody(slot, body);
+      return;
+    }
+
     docState[slot.id] = { file, name: file.name, mimeType: file.type, status: "처리 중", previewUrl: null, base64: null };
     renderSlotBody(slot, body);
 
@@ -765,8 +868,13 @@
     }
 
     // 서류 첨부는 필수가 아닙니다 — 빠뜨려도 제출 가능
-    const notReady = DOC_SLOTS.filter(s => docState[s.id] && docState[s.id].status !== "준비 완료");
-    if (notReady.length > 0) {
+    const notReady = DOC_SLOTS.some(s => {
+      const st = docState[s.id];
+      if (!st) return false;
+      if (s.multi) return st.some(f => f.status !== "준비 완료");
+      return st.status !== "준비 완료";
+    });
+    if (notReady) {
       alert("파일 처리가 아직 끝나지 않았어요. 잠시만 기다려주세요.");
       return;
     }
@@ -775,15 +883,30 @@
     btn.disabled = true;
     btn.textContent = "제출 중...";
 
-    const files = DOC_SLOTS
-      .filter(s => docState[s.id])
-      .map(s => ({
-        label: s.label,
-        shortName: s.shortName,
-        name: docState[s.id].name,
-        mimeType: docState[s.id].mimeType,
-        base64: docState[s.id].base64,
-      }));
+    const files = [];
+    DOC_SLOTS.forEach(s => {
+      const st = docState[s.id];
+      if (!st) return;
+      if (s.multi) {
+        st.forEach((f, i) => {
+          files.push({
+            label: st.length > 1 ? s.label + " (" + (i + 1) + "/" + st.length + ")" : s.label,
+            shortName: st.length > 1 ? s.shortName + "_" + (i + 1) : s.shortName,
+            name: f.name,
+            mimeType: f.mimeType,
+            base64: f.base64,
+          });
+        });
+      } else {
+        files.push({
+          label: s.label,
+          shortName: s.shortName,
+          name: st.name,
+          mimeType: st.mimeType,
+          base64: st.base64,
+        });
+      }
+    });
 
     const payload = {
       formType: "docUpload",
