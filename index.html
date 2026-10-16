@@ -615,7 +615,7 @@
 
       const input = document.createElement("input");
       input.type = "file";
-      input.accept = "image/png,image/jpeg,image/jpg,application/pdf";
+      input.accept = "image/*,application/pdf";
       input.style.display = "none";
       input.id = "input_" + slot.id;
       if (slot.multi) input.multiple = true;
@@ -771,7 +771,7 @@
         ctx.drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL("image/jpeg", quality));
       };
-      img.onerror = reject;
+      img.onerror = () => fileToBase64Raw(file).then(resolve, reject);
       reader.readAsDataURL(file);
     });
   }
